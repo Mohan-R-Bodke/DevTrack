@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Form | DevTrack{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <div class="card">
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    {% if form.instance.pk %}
+                        Edit Project
+                    {% else %}
+                        Create Project
+                    {% endif %}
+                </h1>
+
+                <p>
+                    Enter the project information below.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            {% for field in form %}
+
+            <div class="form-group">
+
+                {{ field.label_tag }}
+
+                {{ field }}
+
+                {% if field.errors %}
+
+                    <small class="error">
+                        {{ field.errors }}
+                    </small>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                {% if form.instance.pk %}
+                    Update Project
+                {% else %}
+                    Create Project
+                {% endif %}
+
+            </button>
+
+
+            <a href="{% url 'project_list' %}"
+               class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

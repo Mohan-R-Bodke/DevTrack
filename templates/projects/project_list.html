@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects | DevTrack{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Projects</h1>
+        <p>Manage and track your development projects.</p>
+    </div>
+
+    <a href="{% url 'project_create' %}"
+       class="btn btn-primary">
+        + New Project
+    </a>
+
+</div>
+
+
+{% if projects %}
+
+<div class="table-container">
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Project</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>Deadline</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for project in projects %}
+
+            <tr>
+
+                <td>
+                    <strong>{{ project.title }}</strong>
+                </td>
+
+                <td>
+
+                    {% if project.status == 'ACTIVE' %}
+
+                        <span class="status status-active">
+                            Active
+                        </span>
+
+                    {% elif project.status == 'COMPLETED' %}
+
+                        <span class="status status-completed">
+                            Completed
+                        </span>
+
+                    {% elif project.status == 'PLANNING' %}
+
+                        <span class="status status-planning">
+                            Planning
+                        </span>
+
+                    {% else %}
+
+                        <span class="status status-hold">
+                            On Hold
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ project.start_date }}
+                </td>
+
+                <td>
+                    {{ project.deadline }}
+                </td>
+
+                <td>
+
+                    <a href="{% url 'project_detail' project.id %}"
+                       class="btn btn-secondary">
+                        View
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% else %}
+
+<div class="card">
+
+    <h2>No Projects Yet</h2>
+
+    <p>
+        Create your first project to start tracking your work.
+    </p>
+
+    <br>
+
+    <a href="{% url 'project_create' %}"
+       class="btn btn-primary">
+        Create Project
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

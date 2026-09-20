@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Task Form | DevTrack{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <div class="card">
+
+        <h1>
+            {% if form.instance.pk %}
+                Edit Task
+            {% else %}
+                Create Task
+            {% endif %}
+        </h1>
+
+        <p>
+            Add task details and assign it to a project.
+        </p>
+
+        <br>
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            {% for field in form %}
+
+            <div class="form-group">
+
+                {{ field.label_tag }}
+
+                {{ field }}
+
+                {% if field.errors %}
+
+                    <small class="error">
+                        {{ field.errors }}
+                    </small>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                {% if form.instance.pk %}
+                    Update Task
+                {% else %}
+                    Create Task
+                {% endif %}
+
+            </button>
+
+
+            <a href="{% url 'task_list' %}"
+               class="btn btn-secondary">
+
+                Cancel
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}DevTrack{% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{% static 'css/style.css' %}">
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a href="{% url 'dashboard' %}"
+               class="logo">
+                DevTrack
+            </a>
+
+            {% if user.is_authenticated %}
+
+            <div class="nav-links">
+
+                <a href="{% url 'dashboard' %}">
+                    Dashboard
+                </a>
+
+                <a href="{% url 'project_list' %}">
+                    Projects
+                </a>
+
+                <a href="{% url 'task_list' %}">
+                    Tasks
+                </a>
+
+                <a href="{% url 'logout' %}"
+                   class="logout-btn">
+                    Logout
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </nav>
+
+
+    <main class="main-container">
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="alert">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        {% block content %}
+
+        {% endblock %}
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            © 2026 DevTrack | Developer Productivity Platform
+        </p>
+
+    </footer>
+
+
+    <script src="{% static 'js/app.js' %}"></script>
+
+</body>
+
+</html>

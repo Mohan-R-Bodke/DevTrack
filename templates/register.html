@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Register | DevTrack{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <div class="card">
+
+        <h1>Create Account</h1>
+
+        <p>Join DevTrack and start managing your projects.</p>
+
+        <br>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% for field in form %}
+
+            <div class="form-group">
+
+                {{ field.label_tag }}
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>
+                        {{ field.help_text }}
+                    </small>
+                {% endif %}
+
+                {% if field.errors %}
+                    <small class="error">
+                        {{ field.errors }}
+                    </small>
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Create Account
+            </button>
+
+        </form>
+
+        <br>
+
+        <p>
+            Already have an account?
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

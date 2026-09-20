@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Tasks | DevTrack{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>Tasks</h1>
+
+        <p>
+            Track your development tasks and deadlines.
+        </p>
+
+    </div>
+
+    <a href="{% url 'task_create' %}"
+       class="btn btn-primary">
+
+        + New Task
+
+    </a>
+
+</div>
+
+
+{% if tasks %}
+
+<div class="table-container">
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Task</th>
+                <th>Project</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Due Date</th>
+                <th>Actions</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        {% for task in tasks %}
+
+            <tr>
+
+                <td>
+                    <strong>{{ task.title }}</strong>
+                </td>
+
+                <td>
+                    {{ task.project.title }}
+                </td>
+
+                <td>
+                    {{ task.get_priority_display }}
+                </td>
+
+                <td>
+                    {{ task.get_status_display }}
+                </td>
+
+                <td>
+                    {{ task.due_date }}
+                </td>
+
+                <td>
+
+                    <a href="{% url 'task_detail' task.id %}"
+                       class="btn btn-secondary">
+
+                        View
+
+                    </a>
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% else %}
+
+<div class="card">
+
+    <h2>No Tasks Yet</h2>
+
+    <p>
+        Create a task to start tracking your development work.
+    </p>
+
+    <br>
+
+    <a href="{% url 'task_create' %}"
+       class="btn btn-primary">
+
+        Create Task
+
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}
