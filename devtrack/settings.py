@@ -35,6 +35,12 @@ ALLOWED_HOSTS = os.getenv(
     '127.0.0.1,localhost'
 ).split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
 # Application definition
 
 INSTALLED_APPS = [
