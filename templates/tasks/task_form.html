@@ -17,16 +17,14 @@
         </h1>
 
         <p>
-            Add task details and assign it to a project.
+            Add task details and assign it to a project member.
         </p>
 
         <br>
 
-
         <form method="POST">
 
             {% csrf_token %}
-
 
             {% for field in form %}
 
@@ -48,24 +46,22 @@
 
             {% endfor %}
 
-
-            <button type="submit"
-                    class="btn btn-primary">
-
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
                 {% if form.instance.pk %}
                     Update Task
                 {% else %}
                     Create Task
                 {% endif %}
-
             </button>
 
-
-            <a href="{% url 'task_list' %}"
-               class="btn btn-secondary">
-
+            <a
+                href="{% url 'task_list' %}"
+                class="btn btn-secondary"
+            >
                 Cancel
-
             </a>
 
         </form>
@@ -73,5 +69,103 @@
     </div>
 
 </div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const projectSelect = document.getElementById("id_project");
+    const assignedSelect = document.getElementById("id_assigned_to");
+
+    if (!projectSelect || !assignedSelect) {
+        return;
+    }
+
+
+    function loadMembers(projectId) {
+
+        // Clear current options
+        assignedSelect.innerHTML = "";
+
+        if (!projectId) {
+
+            const option = document.createElement("option");
+
+            option.value = "";
+            option.textContent = "Select a project first";
+
+            assignedSelect.appendChild(option);
+
+            return;
+        }
+
+
+        fetch(`/projects/${projectId}/members/`)
+            .then(response => response.json())
+            .then(data => {
+
+                // Empty option
+                const emptyOption = document.createElement("option");
+
+                emptyOption.value = "";
+                emptyOption.textContent = "Select a member";
+
+                assignedSelect.appendChild(emptyOption);
+
+
+                data.members.forEach(member => {
+
+                    const option = document.createElement("option");
+
+                    option.value = member.id;
+                    option.textContent = member.username;
+
+                    assignedSelect.appendChild(option);
+
+                });
+
+            })
+            .catch(error => {
+
+                console.error(
+                    "Error loading project members:",
+                    error
+                );
+
+            });
+
+    }
+
+
+    // When project changes
+    projectSelect.addEventListener("change", function () {
+
+        loadMembers(this.value);
+
+    });
+
+
+    // Load members automatically when editing an existing task
+    if (projectSelect.value) {
+
+        const currentAssignedUser = assignedSelect.value;
+
+        loadMembers(projectSelect.value);
+
+        // Restore assigned user after members load
+        setTimeout(function () {
+
+            if (currentAssignedUser) {
+                assignedSelect.value = currentAssignedUser;
+            }
+
+        }, 300);
+
+    }
+
+});
+
+</script>
 
 {% endblock %}

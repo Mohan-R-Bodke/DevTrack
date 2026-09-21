@@ -21,6 +21,12 @@ class Project(models.Model):
         related_name='projects'
     )
 
+    members = models.ManyToManyField(
+        User,
+        related_name='member_projects',
+        blank=True
+    )
+
     start_date = models.DateField()
 
     deadline = models.DateField()
@@ -31,7 +37,9 @@ class Project(models.Model):
         default='PLANNING'
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return self.title

@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.models import User
+
 from .models import Project
 
 
@@ -6,9 +8,11 @@ class ProjectForm(forms.ModelForm):
 
     class Meta:
         model = Project
+
         fields = [
             'title',
             'description',
+            'members',
             'start_date',
             'deadline',
             'status',
@@ -21,8 +25,10 @@ class ProjectForm(forms.ModelForm):
 
             'description': forms.Textarea(attrs={
                 'placeholder': 'Enter project description',
-                'rows': 4
+                'rows': 5
             }),
+
+            'members': forms.CheckboxSelectMultiple(),
 
             'start_date': forms.DateInput(attrs={
                 'type': 'date'
@@ -34,3 +40,17 @@ class ProjectForm(forms.ModelForm):
 
             'status': forms.Select(),
         }
+
+    def __init__(self, *args, **kwargs):
+
+        user = kwargs.pop('user', None)
+
+        super().__init__(*args, **kwargs)
+
+        if user:
+
+            self.fields['members'].queryset = (
+                User.objects
+                .exclude(id=user.id)
+                .order_by('username')
+            )

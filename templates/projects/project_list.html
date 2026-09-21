@@ -28,6 +28,7 @@
         <thead>
             <tr>
                 <th>Project</th>
+                <th>Owner</th>
                 <th>Status</th>
                 <th>Start Date</th>
                 <th>Deadline</th>
@@ -43,6 +44,10 @@
 
                 <td>
                     <strong>{{ project.title }}</strong>
+                </td>
+
+                <td>    
+                    {{ project.owner.username }}
                 </td>
 
                 <td>

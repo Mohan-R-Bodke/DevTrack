@@ -76,12 +76,12 @@
 
                 <td>
 
-                    <a href="{% url 'task_detail' task.id %}"
-                       class="btn btn-secondary">
-
-                        View
-
-                    </a>
+                <a
+                    href="{% url 'task_detail' task.id %}?next={% url 'task_list' %}"
+                    class="btn btn-secondary"
+                >
+                    View
+                </a>
 
                 </td>
 

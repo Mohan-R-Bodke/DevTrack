@@ -1,89 +1,502 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ task.title }} | DevTrack{% endblock %}
+{% block title %}Task Details | DevTrack{% endblock %}
 
 {% block content %}
 
 <div class="page-header">
 
     <div>
-
-        <h1>{{ task.title }}</h1>
-
-        <p>
-            Task details
-        </p>
-
+        <h1>Task Details</h1>
+        <p>View task information and manage its status.</p>
     </div>
 
-    <div>
+    {% if request.GET.next %}
 
-        <a href="{% url 'task_edit' task.id %}"
-           class="btn btn-primary">
+    <a
+        href="{{ request.GET.next }}"
+        class="btn btn-secondary"
+    >
+        ← Back
+    </a>
 
-            Edit
+{% else %}
 
-        </a>
+    <a
+        href="{% url 'task_list' %}"
+        class="btn btn-secondary"
+    >
+        ← Back to Tasks
+    </a>
 
-        <a href="{% url 'task_delete' task.id %}"
-           class="btn btn-danger">
-
-            Delete
-
-        </a>
-
-    </div>
+{% endif %}
 
 </div>
 
 
-<div class="card">
+<div class="card task-detail-card">
 
-    <h2>Task Information</h2>
+    <!-- TASK HEADER -->
 
-    <br>
+    <div class="task-detail-header">
 
-    <p>
-        <strong>Description:</strong>
-    </p>
+        <div>
 
-    <p>
-        {{ task.description|default:"No description provided." }}
-    </p>
+            <h2>{{ task.title }}</h2>
 
-    <br>
+            <span class="status-badge {{ task.status|lower }}">
+                {{ task.get_status_display }}
+            </span>
 
-    <p>
-        <strong>Project:</strong>
-        {{ task.project.title }}
-    </p>
+        </div>
 
-    <p>
-        <strong>Priority:</strong>
-        {{ task.get_priority_display }}
-    </p>
+    </div>
 
-    <p>
-        <strong>Status:</strong>
-        {{ task.get_status_display }}
-    </p>
 
-    <p>
-        <strong>Assigned To:</strong>
+    <!-- TASK INFORMATION -->
 
-        {% if task.assigned_to %}
-            {{ task.assigned_to.username }}
-        {% else %}
-            Unassigned
-        {% endif %}
+    <div class="task-detail-content">
 
-    </p>
+        <div class="detail-item">
 
-    <p>
-        <strong>Due Date:</strong>
-        {{ task.due_date }}
-    </p>
+            <strong>Description</strong>
+
+            <p>
+                {% if task.description %}
+                    {{ task.description }}
+                {% else %}
+                    No description provided.
+                {% endif %}
+            </p>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Project</strong>
+
+            <p>
+                {{ task.project.title }}
+            </p>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Assigned To</strong>
+
+            <p>
+                {% if task.assigned_to %}
+                    {{ task.assigned_to.username }}
+                {% else %}
+                    Unassigned
+                {% endif %}
+            </p>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Priority</strong>
+
+            <p>
+                <span class="priority-badge {{ task.priority|lower }}">
+                    {{ task.get_priority_display }}
+                </span>
+            </p>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Due Date</strong>
+
+            <p>
+                {{ task.due_date }}
+            </p>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Created</strong>
+
+            <p>
+                {{ task.created_at }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- OWNER ACTIONS -->
+
+    {% if is_owner %}
+
+        <div class="task-actions">
+
+            <a
+                href="{% url 'task_edit' task.pk %}"
+                class="btn btn-primary"
+            >
+                Edit Task
+            </a>
+
+
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="document.getElementById('taskDeleteModal').style.display='flex'"
+            >
+                Delete Task
+            </button>
+
+        </div>
+
+
+        <!-- DELETE MODAL -->
+
+        <div
+            id="taskDeleteModal"
+            class="delete-modal"
+        >
+
+            <div class="delete-modal-box">
+
+                <h2>Delete Task?</h2>
+
+                <p>
+                    Are you sure you want to delete
+                    <strong>{{ task.title }}</strong>?
+                </p>
+
+                <p class="delete-warning">
+                    This action cannot be undone.
+                </p>
+
+
+                <div class="delete-modal-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="document.getElementById('taskDeleteModal').style.display='none'"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <form
+                        method="POST"
+                        action="{% url 'task_delete' task.pk %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger"
+                        >
+                            Yes, Delete
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- STATUS UPDATE -->
+
+    <!-- Only the user assigned to this task can update its status -->
+
+    {% if is_assigned %}
+
+        <div class="status-update-section">
+
+            <div class="status-section-header">
+
+                <div>
+
+                    <h3>Update Task Status</h3>
+
+                    <p>
+                        You are assigned to this task. You can
+                        update its status.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form
+                method="post"
+                action="{% url 'task_status_update' task.pk %}"
+                class="status-form"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="status-control">
+
+                    <label for="status">
+                        Task Status
+                    </label>
+
+
+                    <select
+                        name="status"
+                        id="status"
+                        class="form-control"
+                    >
+
+                        <option
+                            value="TODO"
+                            {% if task.status == 'TODO' %}
+                                selected
+                            {% endif %}
+                        >
+                            To Do
+                        </option>
+
+
+                        <option
+                            value="IN_PROGRESS"
+                            {% if task.status == 'IN_PROGRESS' %}
+                                selected
+                            {% endif %}
+                        >
+                            In Progress
+                        </option>
+
+
+                        <option
+                            value="COMPLETED"
+                            {% if task.status == 'COMPLETED' %}
+                                selected
+                            {% endif %}
+                        >
+                            Completed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-primary status-button"
+                >
+                    Update Status
+                </button>
+
+            </form>
+
+        </div>
+
+    {% endif %}
 
 </div>
+
+
+<!-- PAGE-SPECIFIC STYLES -->
+
+<style>
+
+.task-detail-card {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+
+/* Header */
+
+.task-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.task-detail-header h2 {
+    margin: 0 0 12px 0;
+    font-size: 28px;
+}
+
+
+/* Information */
+
+.task-detail-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    padding: 30px 0;
+}
+
+.detail-item {
+    padding: 18px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.detail-item strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.detail-item p {
+    margin: 0;
+    font-size: 16px;
+    color: #1e293b;
+}
+
+
+/* Priority */
+
+.priority-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Actions */
+
+.task-actions {
+    display: flex;
+    gap: 12px;
+    padding: 25px 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+/* Status section */
+
+.status-update-section {
+    margin-top: 20px;
+    padding: 25px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.status-section-header h3 {
+    margin: 0 0 8px 0;
+}
+
+.status-section-header p {
+    margin: 0 0 20px 0;
+    color: #64748b;
+}
+
+.status-form {
+    display: flex;
+    align-items: end;
+    gap: 15px;
+}
+
+.status-control {
+    flex: 1;
+}
+
+.status-control label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.status-button {
+    white-space: nowrap;
+}
+
+
+/* Delete Modal */
+
+.delete-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.delete-modal-box {
+    width: 100%;
+    max-width: 430px;
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.delete-modal-box h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.delete-modal-box p {
+    color: #475569;
+}
+
+.delete-warning {
+    font-size: 14px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+    .task-detail-content {
+        grid-template-columns: 1fr;
+    }
+
+    .task-actions {
+        flex-direction: column;
+    }
+
+    .status-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .status-button {
+        width: 100%;
+    }
+
+}
+
+</style>
 
 {% endblock %}

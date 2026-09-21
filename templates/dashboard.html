@@ -77,6 +77,7 @@
                         <th>Priority</th>
                         <th>Status</th>
                         <th>Due Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
@@ -105,6 +106,15 @@
                         <td>
                             {{ task.due_date }}
                         </td>
+
+                        <td>
+        <a
+            href="{% url 'task_detail' task.id %}?next={% url 'dashboard' %}"
+            class="btn btn-secondary"
+        >
+            View Task
+        </a>
+    </td>
 
                     </tr>
 
